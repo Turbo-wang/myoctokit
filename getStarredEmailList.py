@@ -1,6 +1,7 @@
 # -*- coding:utf8 -*-
 
 import os
+from tqdm import tqdm
 import argparse
 from OctocatKit import OctocatKit
 
@@ -16,13 +17,21 @@ def main():
     octocat_kit = OctocatKit(access_token)
     octocat_kit.set_repo(repo=repo, own=own)
     users = octocat_kit.get_stars_user_list()
+    error_fw = open("get_failed_user.txt", 'w')
     with open("loki_starred_user_list.txt", 'w') as fw:
-        for user_name, user in users.items():
+        for user_name, user in tqdm(users.items()):
             user_name = user.get("login")
-            user_email = octocat_kit.get_user_info(user_name)
-            if user_email:
-                fw.write(user_name + "\t" + user_email)
-                fw.write("\n")
+            user_info = octocat_kit.get_user_info(user_name)
+            if user_info:
+                user_email = user_info.get("email")
+                if user_email:
+                    fw.write(user_name + "\t" + user_email)
+                    fw.write("\n")
+            else:
+                error_fw.write(user_name)
+                error_fw.write("\n")
+    error_fw.close()
+            
 
 
 if __name__ == "__main__":
