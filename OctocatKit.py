@@ -1,6 +1,7 @@
 # -*- coding:utf8 -*-
 
 import requests
+from collections import OrderedDict
 
 class OctocatKit:
 
@@ -29,7 +30,7 @@ class OctocatKit:
         page_size = 100
         stars_num = self.get_stars_number()
         page_max = stars_num // page_size + 1
-        user_list = list()
+        users = OrderedDict()
         for page_index in range(0, page_max):
             parameters = {
                 "per_page": 100,
@@ -37,9 +38,11 @@ class OctocatKit:
             }
             resp = requests.get(url=url, headers=self._headers, params=parameters)
             for user in resp.json():
-                user_list.append(user)
-        print(f"stared user amount is {stars_num}; We crawled {len(user_list)} users")
-        return user_list
+                user_name = user.get("login")
+                if user_name not in users:
+                    users[user_name] = user
+        print(f"stared user amount is {stars_num}; We crawled {len(users)} users")
+        return users
 
 
 
