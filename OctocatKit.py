@@ -21,8 +21,12 @@ class OctocatKit:
 
     def get_stars_number(self):
         url = f"https://api.github.com/repos/{self.own}/{self.repo}"
-        resp = requests.get(url, headers=self._headers)
-        return resp.json().get("stargazers_count", -1)
+        try:
+            resp = requests.get(url, headers=self._headers)
+            return resp.json().get("stargazers_count", -1)
+        except Exception as e:
+            print(e)
+            return None
 
         
     def get_stars_user_list(self):
@@ -36,13 +40,28 @@ class OctocatKit:
                 "per_page": 100,
                 "page": page_index 
             }
-            resp = requests.get(url=url, headers=self._headers, params=parameters)
-            for user in resp.json():
-                user_name = user.get("login")
-                if user_name not in users:
-                    users[user_name] = user
+            try:
+                resp = requests.get(url=url, headers=self._headers, params=parameters)
+                for user in resp.json():
+                    user_name = user.get("login")
+                    if user_name not in users:
+                        users[user_name] = user
+            except Exception as e:
+                print(f"fetch page {page_index} error: ", e)
         print(f"stared user amount is {stars_num}; We crawled {len(users)} users")
         return users
+
+
+    def get_user_info(self, user_login_id):
+        url = f"https://api.github.com/users/{user_login_id}"
+        try:
+            resp = requests.get(url=url, headers=self._headers)
+            return resp.json()
+        except Exception as e:
+            print(e)
+            return None
+
+
 
 
 

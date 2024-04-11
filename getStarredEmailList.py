@@ -19,7 +19,7 @@ def main():
     with open("loki_starred_user_list.txt", 'w') as fw:
         for user_name, user in users.items():
             user_name = user.get("login")
-            user_email = user.get("email")
+            user_email = octocat_kit.get_user_info(user_name)
             if user_email:
                 fw.write(user_name + "\t" + user_email)
                 fw.write("\n")
